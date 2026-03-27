@@ -1,0 +1,12 @@
+---
+title: "Week 9 Assignment: NYT API"
+author: "Emily El Mouaquite"
+format: html
+editor: visual
+---
+
+## Approach
+
+**Do multimedia elements (e.g. images & videos) increase the probability of an article being highly viewed?**
+
+In order to answer this question, I will use the New York Times' Most Popular API to collect data on the top 300 most viewed articles of the last year. This involves organizing the information from the API into a data frame, which can then be analyzed through a summary of how many of the most viewed articles include media, and a comparison of the view counts of articles with media to those without media. 
