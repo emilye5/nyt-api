@@ -1,0 +1,64 @@
+---
+title: "Week 9 Assignment: NYT API"
+author: "Emily El Mouaquite"
+format: html
+editor: visual
+---
+
+## Approach
+
+**Do multimedia elements (e.g. images & videos) increase the probability of an article being highly viewed?**
+
+In order to answer this question, I will use the New York Times' Most Popular API to collect data on the top most viewed articles of the last month. This involves organizing the information from the API into a data frame, which can then be analyzed through a summary of how many of the most viewed articles include media, and a comparison of the view counts of articles with media to those without media.
+
+## Code Base
+
+```{r}
+#load libraries
+library(httr)
+library(jsonlite)
+library(tidyverse)
+```
+
+First, the NYT Most Popular API needs to be authenticated and accessed.
+
+```{r}
+#store key in environment variable (replace with your own key locally)
+key <- Sys.getenv("NYT_API_KEY")
+#request API URL for the most viewed articles from the last 30 days by combining endpoint & key
+url <- paste0("https://api.nytimes.com/svc/mostpopular/v2/viewed/30.json?api-key=", key)
+```
+
+Then, a request for a JSON with the most viewed articles from the last 30 days can be initiated.
+
+```{r}
+#request/ parse JSON request
+request <- GET(url)
+articles <- content(request, as = "text", encoding = "UTF-8")
+articles_parsed <- fromJSON(articles)
+```
+
+Creation of a data frame from the JSON:
+
+```{r}
+#tibble creation
+articles_df <- as_tibble(articles_parsed$results) %>%
+  select(title, byline, published_date, section, url, media)
+head(articles_df)
+```
+
+**Media Analysis**
+```{r}
+#add a column representative of whether or not an article has any form of multimedia
+articles_df <- articles_df %>%
+  mutate(has_media = sapply(media, function(x) length(x) > 0))
+#summarize the count of articles with media
+has_media <- articles_df %>%
+  group_by(has_media) %>%
+  summarise(count = n())
+print("Count of articles with vs without media:")
+print(has_media)
+```
+
+## Conclusion
+Of the top 20 articles from the last 30 days, 19 of them have some sort of multimedia element, while only one of them does not. This suggests that there is a relationship between media and the views that an article gets, and indicates that including videos or images may be related to attracting more readers. In order to extend/ verify this work, one could create an accompanying visualization that supports this relationship. One might also build upon it by looking at a wider variety of articles. Linear regression could also be done to formally test the relationship between multimedia elements and article views. 
